@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<head>
+  <script src="static/js/echarts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" rel="stylesheet">
+  <style media="screen">
+    .button{
+      position:fixed;
+      bottom: 5.5vh;
+      width:50vw;
+      height:3.5vh;
+      background: #ccc;
+      color:#fff;
+      text-align:center;
+      vertical-align:middle;
+      line-height:3.5vh;
+      border:  none;
+    }
+    .settings{
+      width:47vw;
+      height:47.5vh;
+      float:right;
+      margin-top:1vh;
+      box-sizing:border-box;
+    }
+  </style>
+</head>
+<body>
+  <div id ='handsontable' style="width:50vw;height:91vh;float:left;border:1px solid #ccc;box-sizing:border-box;">
+  <button id='button' class="button">导出</button>
+  </div>
+  </div>
+  <div id='echarts' style="width:47vw;height:45vh;float:right;border:1px solid #ccc;box-sizing:border-box;overflow:scroll"></div>
+  <div>
+    <textarea id='settings' class="settings"></textarea>
+  </div>
+  <script>
+    var data = [
+      ['type','bar','bar','bar','bar'],
+      ['Category', 'Series1','Series2','Series3','Series4'],
+      ['2019', 10, 11, 12, 13],
+      ['2020', 20, 11, 14, 13],
+      ['2021', 30, 15, 12, 13]
+    ];
+    var container=document.getElementById('handsontable');
+    var hot=new Handsontable(container,{
+      startCols: 18,
+      startRows: 36,
+      height: '90vh',
+      rowHeaders:true,
+      colHeaders:true,
+      licenseKey: 'non-commercial-and-evaluation',
+      contextMenu:true,
+      preventOverflow: 'horizontal',
+      manualColumnResize: true,
+      manualRowResize: true,
+    })
+    hot.populateFromArray(0,0,data);
+    var button=document.getElementById('button');
+    button.onclick=function(){init_echrts();}
+  </script>
+
+  <script>
+  var myChart=echarts.init(document.getElementById('echarts'));
+    function init_echrts(){
+      var data=hot.getSourceData().map(
+        function(item){
+          return item.filter(n=>n);
+        }
+      ).filter(n=>n.length!=0);
+      var series=data[0].map(function(item){return{type:item}});
+      series.shift();
+      data.shift();
+      var option={
+        dataset:{
+          source:data
+        },
+        tooltip:{},
+        legend:{},
+        xAxis:{type:'category'},
+        yAxis:{},
+        series:series
+      };
+      myChart.setOption(option);
+      document.getElementById('settings').value=JSON.stringify(option);
+    }
+  </script>
+</body>
